@@ -23,7 +23,11 @@ with open(file_path, 'r') as f:
 
 cc = cc.split("\n")
 cc = "".join(cc)
-cc = cc[100000:200000]
+cc_train = cc[100000:200000]
+cc_test = cc[200001:300001]
 
 with open("./NC_000006_12_Homo_sapiens_chromosome_6_GRCh38_p13_Primary_Assembly.txt", 'w') as c:
-    c.write(cc)
+    c.write(cc_train)
+
+with open("./NC_000006_12_Homo_sapiens_chromosome_6_GRCh38_p13_Primary_Assembly_test.txt", 'w') as c:
+    c.write(cc_test)

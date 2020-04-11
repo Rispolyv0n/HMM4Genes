@@ -37,14 +37,10 @@ class MarkovBase(object):
         self.cond_prob = None
         return
     
-
-    def fit(self):
-        raise NotImplementedError('Function `fit` should be implemented.')
     
-    
-    """
+    '''
     Generate a sequence with the fitted conditional probability.
-    """
+    '''
     def generate(self, seq_len):
         if not isinstance(seq_len, int):
             raise TypeError('Invalid parameter `seq_len`.')
@@ -63,26 +59,18 @@ class MarkovBase(object):
                 seq += self._next_choice(seq[-self.order:])
 
         return seq
-
-
-    def generating_prob(self):
-        raise NotImplementedError('Function `generating_prob` should be implemented.')
     
 
-    """
+    '''
     Generate the first character of the sequence.
     The probabilities of deciding which character is going to be generated are equal.
-    """
+    '''
     def _first_choice(self):
         random_num = random.random()
         for index in range(self.vocab_size):
             cur_threshold = (index+1) * (1/self.vocab_size)
             if random_num <= cur_threshold:
                 return self.id2vocab[index]
-
-
-    def _next_choice(self):
-        raise NotImplementedError('Function `_next_choice` should be implemented.')
 
 
 class MarkovOrderZero(object):
@@ -119,9 +107,9 @@ class MarkovOrderZero(object):
         return
 
 
-    """
+    '''
     Calculate subsequence occurrences and convert it into conditional probabilities.
-    """
+    '''
     def fit(self, seq):
         if not isinstance(seq, str):
             raise TypeError('Invalid parameter `seq`.')
@@ -138,9 +126,9 @@ class MarkovOrderZero(object):
         return
     
 
-    """
+    '''
     Convert the number of counts in `self.cond_prob` into probabilities which should sum to 1.
-    """
+    '''
     def _adjust_cond_prob(self):
         self.cond_prob = self.counts.copy()
         occur_count = 0
@@ -155,9 +143,9 @@ class MarkovOrderZero(object):
         return
 
 
-    """
+    '''
     Generate a sequence with the fitted conditional probability.
-    """
+    '''
     def generate(self, seq_len):
         if not isinstance(seq_len, int):
             raise TypeError('Invalid parameter `seq_len`.')
@@ -176,10 +164,10 @@ class MarkovOrderZero(object):
         return seq
 
 
-    """
+    '''
     Generate the next character.
     The probabilities of deciding which character is going to be generated are based on `self.cond_prob`.
-    """
+    '''
     def _next_choice(self):
         if self.cond_prob == None:
             raise UnboundLocalError('Model hasn\'t been fitted yet.')
@@ -199,9 +187,9 @@ class MarkovOrderZero(object):
         return self.cond_prob.items()[-1][1]
 
 
-    """
+    '''
     Calculate the (log base 2) probabilitiy of generating a given sequence.
-    """
+    '''
     def generating_prob(self, seq):
         if self.cond_prob == None:
             raise UnboundLocalError('Model hasn\'t been fitted yet.')
@@ -235,9 +223,9 @@ class MarkovOrderOne(MarkovBase):
 
         return
 
-    """
+    '''
     Calculate subsequence occurrences and convert it into conditional probabilities.
-    """
+    '''
     def fit(self, seq):
         if not isinstance(seq, str):
             raise TypeError('Invalid parameter `seq`.')
@@ -259,9 +247,9 @@ class MarkovOrderOne(MarkovBase):
         return
 
 
-    """
+    '''
     Convert the number of counts in `self.cond_prob` into probabilities which should sum to 1.
-    """
+    '''
     def _adjust_cond_prob(self):
         self.cond_prob = self.counts.copy()
         for char in self.counts.keys():
@@ -277,10 +265,10 @@ class MarkovOrderOne(MarkovBase):
         return
 
 
-    """
+    '''
     Generate the next character based on the given sequence.
     The probabilities of deciding which character is going to be generated are based on `self.cond_prob`.
-    """
+    '''
     def _next_choice(self, cur_seq):
         if self.cond_prob == None:
             raise UnboundLocalError('Model hasn\'t been fitted yet.')
@@ -307,9 +295,9 @@ class MarkovOrderOne(MarkovBase):
             return sorted_choices.items()[-1][1]
 
     
-    """
+    '''
     Calculate the (log base 2) probabilitiy of generating a given sequence.
-    """
+    '''
     def generating_prob(self, seq):
         if self.cond_prob == None:
             raise UnboundLocalError('Model hasn\'t been fitted yet.')
@@ -349,9 +337,9 @@ class MarkovOrderTwo(MarkovBase):
         return
 
 
-    """
+    '''
     Calculate subsequence occurrences and convert it into conditional probabilities.
-    """
+    '''
     def fit(self, seq):
         if not isinstance(seq, str):
             raise TypeError('Invalid parameter `seq`.')
@@ -372,9 +360,9 @@ class MarkovOrderTwo(MarkovBase):
         return
 
 
-    """
+    '''
     Convert the number of counts in `self.cond_prob` into probabilities which should sum to 1.
-    """
+    '''
     def _adjust_cond_prob(self):
         self.cond_prob = self.counts.copy()
         for char_first in self.counts.keys():
@@ -391,10 +379,10 @@ class MarkovOrderTwo(MarkovBase):
         return
 
 
-    """
+    '''
     Generate the next character based on the given sequence.
     The probabilities of deciding which character is going to be generated are based on `self.cond_prob`.
-    """
+    '''
     def _next_choice(self, cur_seq):
         if self.cond_prob == None:
             raise UnboundLocalError('Model hasn\'t been fitted yet.')
@@ -421,9 +409,9 @@ class MarkovOrderTwo(MarkovBase):
             return sorted_choices.items()[-1][1]
         
     
-    """
+    '''
     Calculate the (log base 2) probabilitiy of generating a given sequence.
-    """
+    '''
     def generating_prob(self, seq):
         if self.cond_prob == None:
             raise UnboundLocalError('Model hasn\'t been fitted yet.')
@@ -475,7 +463,7 @@ def test():
     generated_seq = markov_model_two.generate(len(seq))
     print(f'Generated sequence: {generated_seq}')
     print(f'Target sequence generation probability: {markov_model_two.generating_prob(seq)}')
-    
+
     return
 
 
