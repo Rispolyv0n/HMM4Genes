@@ -32,8 +32,6 @@ def main():
         print(f'\n=== {model_name} ===')
         model = model_infos[model_name]['class'](vocab=set(s), random_seed=17)
         model.fit(s)
-        generated_seq = model.generate(len(s))
-        # print(f'Generated sequence: {generated_seq}')
         print(f'Target sequence generation probability: {model.generating_prob(s)}')
 
     # TODO: run hidden Markov models
