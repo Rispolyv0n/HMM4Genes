@@ -1,10 +1,17 @@
 import logging
+from argparse import ArgumentParser
+import sys
 
 from model import MarkovOrderZero, MarkovOrderOne, MarkovOrderTwo
 
 def main():
-    logging.basicConfig(level=logging.INFO,
-            format='\n%(asctime)s %(name)-5s === %(levelname)-5s === %(message)s\n')
+    parser = ArgumentParser()
+    parser.add_argument('-p', '--print-detail', help='Whether to print details.', action='store_true')
+    args = parser.parse_args()
+
+    if args.print_detail:
+        logging.basicConfig(level=logging.INFO,
+                format='\n%(asctime)s %(name)-5s === %(levelname)-5s === %(message)s\n')
 
     # read target sequence
     seq_file_path = "./NC_000006_12_Homo_sapiens_chromosome_6_GRCh38_p13_Primary_Assembly.txt"
