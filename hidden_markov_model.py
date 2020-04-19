@@ -149,14 +149,6 @@ def test():
     seq = "atccatgcatgaccatggtcag"
     print(f'Target sequence: {seq}')
 
-    # test markov model order 1
-    # print('\n=== Markov Model Order 1 ===')
-    # markov_model_one = MarkovOrderOne(vocab=set(seq), random_seed=17)
-    # markov_model_one.fit(seq)
-    # generated_seq = markov_model_one.generate(len(seq))
-    # print(f'Generated sequence: {generated_seq}')
-    # print(f'Target sequence generation probability: {markov_model_one.generating_prob(seq)}')
-
     # test hidden markov model
     print('\n=== Hidden Markov Model ===')
     hidden_markov_model = HiddenMarkovModel(vocab=set(seq), random_seed=17)

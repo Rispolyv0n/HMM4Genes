@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 import sys
 
 from markov_model import MarkovOrderZero, MarkovOrderOne, MarkovOrderTwo
+from hidden_markov_model import HiddenMarkovModel
 
 def main():
     parser = ArgumentParser()
@@ -52,7 +53,8 @@ def main():
         print(f'Another 100k sequence generation probability: {model.generating_prob(test_s)}')
 
     # TODO: run hidden Markov models
-    
+    hidden_markov_model = HiddenMarkovModel(vocab=set(s), random_seed=17)
+    hidden_markov_model.fit(s)
     return
 
 if __name__ == '__main__':
