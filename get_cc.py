@@ -5,7 +5,6 @@ start: "ttggtaccat"
 end: "CTTTGCCTG"
 '''
 
-
 file_path = "./data/GRCh38_latest_genomic.fna"
 
 with open(file_path, 'r') as f:

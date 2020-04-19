@@ -2,7 +2,7 @@ import logging
 from argparse import ArgumentParser
 import sys
 
-from model import MarkovOrderZero, MarkovOrderOne, MarkovOrderTwo
+from markov_model import MarkovOrderZero, MarkovOrderOne, MarkovOrderTwo
 
 def main():
     parser = ArgumentParser()
