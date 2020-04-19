@@ -55,6 +55,8 @@ def main():
     # TODO: run hidden Markov models
     hidden_markov_model = HiddenMarkovModel(vocab=set(s), random_seed=17)
     hidden_markov_model.fit(s)
+    print(f'Target sequence generation probability: {hidden_markov_model.generating_prob(s)}')
+    print(f'Another 100k sequence generation probability: {hidden_markov_model.generating_prob(test_s)}')
     return
 
 if __name__ == '__main__':

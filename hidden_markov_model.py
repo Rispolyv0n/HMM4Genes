@@ -1,9 +1,11 @@
 from nltk import trigrams
 from markov_model import MarkovBase
+import numpy as np
 
 import logging
 import random
 import re
+import math
 
 class HiddenMarkovModel(MarkovBase):
     def __init__(self, vocab, random_seed):
@@ -146,7 +148,7 @@ class HiddenMarkovModel(MarkovBase):
 
         for s_from, v in self.state_change.items():
             for s_to, count in v.items():
-                self.state_change_prob[s_from][s_to] += count/(len(seq)-2)
+                self.state_change_prob[s_from][s_to] = count/(sum([c for k, c in v.items()]))
         return
 
     def fit(self, seq):
@@ -180,6 +182,27 @@ class HiddenMarkovModel(MarkovBase):
         logging.info(f'State_Change_Prob: {self.state_change_prob}')
         return
 
+    def generating_prob(self, seq):
+        cur_state_prob = np.array(list(v for k, v in self.init_state_prob.items()))
+        state_change_prob = np.array(
+            [
+                [ self.state_change_prob[state_start][state_end] for state_end in ['h', 'l'] ]
+                    for state_start in ['h', 'l']
+            ]
+        )
+        output_prob = np.array(
+            [ 
+                [ self.state_prob[state][char] for char in self.vocab ] 
+                    for state in ['h', 'l']
+            ]
+        )
+        cur_prob = 0
+        for char in seq:
+            cur_state_prob = np.dot(cur_state_prob, state_change_prob)
+            cur_output_prob = np.dot(cur_state_prob, output_prob)
+            cur_prob += math.log(cur_output_prob[self.vocab2id[char]], 2)
+        return cur_prob
+
 def test():
     logging.basicConfig(level=logging.INFO,
             format='\n%(asctime)s %(name)-5s === %(levelname)-5s === \n%(message)s\n')
@@ -193,7 +216,7 @@ def test():
     hidden_markov_model.fit(seq)
     # generated_seq = hidden_markov_model.generate(len(seq))
     # print(f'Generated sequence: {generated_seq}')
-    # print(f'Target sequence generation probability: {hidden_markov_model.generating_prob(seq)}')
+    print(f'Target sequence generation probability: {hidden_markov_model.generating_prob(seq)}')
 
 if __name__=="__main__":
     test()
