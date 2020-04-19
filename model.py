@@ -1,7 +1,6 @@
 import random
 import logging
 import math
-from itertools import combinations_with_replacement
 
 
 class MarkovBase(object):
@@ -63,7 +62,7 @@ class MarkovBase(object):
 
     '''
     Generate the first character of the sequence.
-    The probabilities of deciding which character is going to be generated are equal.
+    The probabilities of deciding which character is going to be generated are the same.
     '''
     def _first_choice(self):
         random_num = random.random()
