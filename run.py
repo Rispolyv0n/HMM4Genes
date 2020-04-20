@@ -62,8 +62,7 @@ def main():
         f.write(''.join(hidden_markov_model.state_sequence(s)))
     with open('./state_seq_test_s.txt', 'w') as f:
         f.write(''.join(hidden_markov_model.state_sequence(test_s)))
-    # print(f'The most likely state sequence for emitting the target sequence: {hidden_markov_model.state_sequence(s)}')
-    # print(f'The most likely state sequence for emitting another 100k sequence: {hidden_markov_model.state_sequence(test_s)}')
+
     return
 
 if __name__ == '__main__':
