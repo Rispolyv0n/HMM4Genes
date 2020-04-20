@@ -52,11 +52,18 @@ def main():
         print(f'Target sequence generation probability: {model.generating_prob(s)}')
         print(f'Another 100k sequence generation probability: {model.generating_prob(test_s)}')
 
-    # TODO: run hidden Markov models
+    # run hidden Markov models
+    print(f'\n=== Hidden Markov Model ===')
     hidden_markov_model = HiddenMarkovModel(vocab=set(s), random_seed=17)
     hidden_markov_model.fit(s)
     print(f'Target sequence generation probability: {hidden_markov_model.generating_prob(s)}')
     print(f'Another 100k sequence generation probability: {hidden_markov_model.generating_prob(test_s)}')
+    with open('./state_seq_s.txt', 'w') as f:
+        f.write(''.join(hidden_markov_model.state_sequence(s)))
+    with open('./state_seq_test_s.txt', 'w') as f:
+        f.write(''.join(hidden_markov_model.state_sequence(test_s)))
+    # print(f'The most likely state sequence for emitting the target sequence: {hidden_markov_model.state_sequence(s)}')
+    # print(f'The most likely state sequence for emitting another 100k sequence: {hidden_markov_model.state_sequence(test_s)}')
     return
 
 if __name__ == '__main__':

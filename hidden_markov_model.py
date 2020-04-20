@@ -1,6 +1,7 @@
 from nltk import trigrams
 from markov_model import MarkovBase
 import numpy as np
+from tqdm import tqdm
 
 import logging
 import random
@@ -35,12 +36,22 @@ class HiddenMarkovModel(MarkovBase):
             "l": {"h": 0, "l": 0},
         }
 
+        self.id2state = {
+            0: 'h',
+            1: 'l',
+        }
+        self.state2id = {
+            'h': 0,
+            'l': 1,
+        }
+
         # decide the prob of deciding the first char of sequences: equal distribution
         self.first_choice_prob = {}
         for char in self.vocab:
             self.first_choice_prob[char] = 1/(self.vocab_size)
 
         self.cond_prob = None
+
 
     def _to_cond_prob(self):
         '''
@@ -57,6 +68,7 @@ class HiddenMarkovModel(MarkovBase):
                 for target in self.counts[char].keys():
                     self.cond_prob[char][target] = self.counts[char][target]/occur_count
         return
+
 
     def get_state_prob(self):
         '''
@@ -112,6 +124,7 @@ class HiddenMarkovModel(MarkovBase):
         self.state_prob["l"] = state_low_prob
         return
 
+
     def get_state_change(self, seq):
         '''
         get the trigram of sequences to calculate the   
@@ -151,6 +164,7 @@ class HiddenMarkovModel(MarkovBase):
                 self.state_change_prob[s_from][s_to] = count/(sum([c for k, c in v.items()]))
         return
 
+
     def fit(self, seq):
         '''
         Calculate subsequence occurrences and convert it into conditional probabilities.
@@ -168,32 +182,27 @@ class HiddenMarkovModel(MarkovBase):
             if index < pair_num:
                 self.counts[char][seq[index+1]] += 1
         
-        # logging.info(f'Counts: {self.counts}')
         self._to_cond_prob()
-        # logging.info(f'Cond_prob: {self.cond_prob}')
         self.get_state_prob()
-        # logging.info(f'State_High: {self.state_high}')
-        # logging.info(f'State_Low: {self.state_low}')
         logging.info(f'State_Prob: {self.state_prob}')
         logging.info(f'Init_State_Prob: {self.init_state_prob}')
         self.get_state_change(seq)
-        # logging.info(f'State_Count: {self.state_count}')
-        # logging.info(f'State_Change: {self.state_change}')
         logging.info(f'State_Change_Prob: {self.state_change_prob}')
         return
+
 
     def generating_prob(self, seq):
         cur_state_prob = np.array(list(v for k, v in self.init_state_prob.items()))
         state_change_prob = np.array(
             [
-                [ self.state_change_prob[state_start][state_end] for state_end in ['h', 'l'] ]
-                    for state_start in ['h', 'l']
+                [ self.state_change_prob[state_start][state_end] for state_end in self.state2id.keys() ]
+                    for state_start in self.state2id.keys()
             ]
         )
         output_prob = np.array(
             [ 
                 [ self.state_prob[state][char] for char in self.vocab ] 
-                    for state in ['h', 'l']
+                    for state in self.state2id.keys()
             ]
         )
         cur_prob = 0
@@ -202,6 +211,37 @@ class HiddenMarkovModel(MarkovBase):
             cur_output_prob = np.dot(cur_state_prob, output_prob)
             cur_prob += math.log(cur_output_prob[self.vocab2id[char]], 2)
         return cur_prob
+
+
+    def state_sequence(self, seq):
+
+        # initialize
+        v = [{}]
+        path = {}
+        for state in self.state2id.keys():
+            v[0][state] = self.init_state_prob[state]*self.state_prob[state][seq[0]]
+            path[state] = [state]
+
+        # calculate the most likely path in each timestamp
+        for index, char in tqdm(enumerate(seq)):
+            if index > 0:
+                v.append({})
+                newpath = {}
+
+                for cur_state in self.state2id.keys():
+                    (likely_last_prob, likely_last_state) = max(
+                        [ ( v[index-1][last_state] * self.state_change_prob[last_state][cur_state] * self.state_prob[cur_state][char], last_state )
+                            for last_state in self.state2id.keys()
+                        ])
+                    v[index][cur_state] = likely_last_prob
+                    newpath[cur_state] = path[likely_last_state] + [cur_state]
+                
+                path = newpath
+
+        # decide the most likely path
+        (most_likely_prob, most_likely_path) = max([(v[-1][state], path[state]) for state in self.state2id.keys()])
+        return most_likely_path
+
 
 def test():
     logging.basicConfig(level=logging.INFO,
@@ -214,9 +254,8 @@ def test():
     print('\n=== Hidden Markov Model ===')
     hidden_markov_model = HiddenMarkovModel(vocab=set(seq), random_seed=17)
     hidden_markov_model.fit(seq)
-    # generated_seq = hidden_markov_model.generate(len(seq))
-    # print(f'Generated sequence: {generated_seq}')
     print(f'Target sequence generation probability: {hidden_markov_model.generating_prob(seq)}')
+    print(f'The most likely state sequence for emitting the target sequence: {hidden_markov_model.state_sequence(seq)}')
 
 if __name__=="__main__":
     test()
