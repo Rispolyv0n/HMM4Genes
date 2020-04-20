@@ -58,6 +58,7 @@ def main():
     hidden_markov_model.fit(s)
     print(f'Target sequence generation probability: {hidden_markov_model.generating_prob(s)}')
     print(f'Another 100k sequence generation probability: {hidden_markov_model.generating_prob(test_s)}')
+    # write state sequences to text files
     with open('./state_seq_s.txt', 'w') as f:
         f.write(''.join(hidden_markov_model.state_sequence(s)))
     with open('./state_seq_test_s.txt', 'w') as f:

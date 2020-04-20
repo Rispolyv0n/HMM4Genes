@@ -192,6 +192,10 @@ class HiddenMarkovModel(MarkovBase):
 
 
     def generating_prob(self, seq):
+        '''
+        Calculate the (log base 2) probabilitiy of generating a given sequence.
+        '''
+        # convert dict to numpy array
         cur_state_prob = np.array(list(v for k, v in self.init_state_prob.items()))
         state_change_prob = np.array(
             [
@@ -214,7 +218,9 @@ class HiddenMarkovModel(MarkovBase):
 
 
     def state_sequence(self, seq):
-
+        '''
+        Use Viterbi algorithm to calculate the most likely state sequence for emitting the given sequence `seq`.
+        '''
         # initialize
         v = [{}]
         path = {}
